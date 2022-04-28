@@ -1,43 +1,26 @@
-/** @format */
-
-const dbConfig = require("../config/dbConfig.js");
-
-const { Sequelize, DataTypes } = require("sequelize");
-
-const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
-  host: dbConfig.HOST,
-  dialect: dbConfig.dialect,
-  operatorsAliases: false,
-
-  pool: {
-    max: dbConfig.pool.max,
-    min: dbConfig.pool.min,
-    acquire: dbConfig.pool.acquire,
-    idle: dbConfig.pool.idle,
-  },
+const databaseConfig = require('../config/config.js');
+const Sequelize = require('sequelize');
+const sequelize = new Sequelize(databaseConfig.database, databaseConfig.username, databaseConfig.password, {
+    host: databaseConfig.host,
+    dialect: databaseConfig.dialect,
+    operatorsAliases: false,
+    pool: {
+        max: databaseConfig.pool.max,
+        min: databaseConfig.pool.min,
+        acquire: databaseConfig.pool.acquire,
+        idle: databaseConfig.pool.idle
+    },
+    define: {
+        timestamps: false
+    },
+    logging: false
 });
-
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log("connected....");
-  })
-  .catch((err) => {
-    console.log("Error:", err);
-  });
-
 const db = {};
-
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
-db.users = require("./users.js")(sequelize, DataTypes);
-db.todos = require("./todos.js")(sequelize, DataTypes);
 
-db.todos.hasOne(db.users, {
-  foreignKey: "id",
-});
-db.sequelize.sync({ force: false }).then(() => {
-  console.log("yes re-sync done");
-});
+db.team = require('./team.js')(Sequelize, sequelize);
+db.todo = require('./todo.js')(Sequelize, sequelize);
+db.users = require('./users.js')(Sequelize, sequelize);
 
 module.exports = db;

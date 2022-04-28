@@ -1,19 +1,31 @@
-/** @format */
-
-module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define("user", {
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    number: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  });
-  return User;
-};
+module.exports = (Sequelize, sequelize) => {
+    const users = sequelize.define('users', {
+        id: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+        },
+        name: {
+            type: Sequelize.STRING,
+            allowNull: false
+        },
+        teamId: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+            defaultValue: null,
+            references: {
+                model: 'team',
+                key: 'id',
+                onDelete: 'SET NULL'
+            }
+        },
+        priority: {
+            type: Sequelize.INTEGER,
+            allowNull: false
+        },
+    }, {
+        tableName: "users",
+        freezeTableName: true
+    });
+    return users;
+}
