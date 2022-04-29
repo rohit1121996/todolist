@@ -1,3 +1,5 @@
+/** @format */
+
 const db = require("../models");
 
 exports.getAllTodos = (req, res) => {
@@ -23,7 +25,7 @@ exports.createTodo = (req, res) => {
   const name = req.body.name;
   const description = req.body.description;
   const teamId = req.body.teamId;
-
+  console.log(teamId);
   // query to find all user id which are not present in todos table and their team id is same as team id passed in request
   query = `SELECT * FROM users WHERE users.id NOT IN (SELECT "userId" FROM todo) AND users."teamId" = ${teamId}  ORDER by priority`;
   // execute query using sequelize
@@ -58,9 +60,9 @@ exports.createTodo = (req, res) => {
           });
       } else {
         // Query to find all users in todos table grouped by count of their user id and order by count and priority
-        query = `SELECT users.id, users.name, users.priority, COUNT(todo."userId") 
-        AS count FROM users LEFT JOIN todo ON users.id = todo."userId"
-        GROUP BY users.id ORDER BY count ASC, users.priority limit 1;`;
+        query = `select * from  (SELECT users.id, users.name, users.priority, users."teamId",COUNT(todo."userId") 
+        AS count FROM users LEFT JOIN todo ON  users.id = todo."userId" 
+        GROUP BY users.id ORDER BY count ASC, users.priority) as UsersTabel where UsersTabel."teamId" = ${teamId} LIMIT 1;`;
 
         // execute query using sequelize
         db.sequelize
